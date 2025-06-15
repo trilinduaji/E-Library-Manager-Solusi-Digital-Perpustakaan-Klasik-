@@ -1,8 +1,73 @@
-#include<iostream>
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <limits>
 using namespace std;
 
-int main(){
-
-
-return 0;
-}
+struct RiwayatPinjaman {
+    string isbn;
+    string judul;
+    string tanggal;
+    string status; // "Dipinjam" atau "Dikembalikan"
+};
+class Buku {
+public:
+    string judul;
+    string penulis;
+    string isbn;
+    int jumlahSalinan;
+    int salinanTersedia;
+    Buku(string j, string p, string i, int js)
+        : judul(j), penulis(p), isbn(i), jumlahSalinan(js), salinanTersedia(js) {}
+    void tampilkanDetailBuku() const {
+        cout << "------------------------------------" << endl;
+        cout << "Judul         : " << judul << endl;
+        cout << "Penulis       : " << penulis << endl;
+        cout << "ISBN          : " << isbn << endl;
+        cout << "Salinan Tersedia: " << salinanTersedia << "/" << jumlahSalinan << endl;
+        cout << "------------------------------------" << endl;
+    }
+    bool pinjamBuku() {
+        if (salinanTersedia > 0) {
+            salinanTersedia--;
+            return true;
+        }
+        return false;
+    }
+    void kembalikanBuku() {
+        if (salinanTersedia < jumlahSalinan) {
+            salinanTersedia++;
+        }
+    }
+};
+class Anggota {
+public:
+    string nama;
+    string idAnggota;
+    vector<Buku*> bukuDipinjam;
+    vector<RiwayatPinjaman> riwayatPinjaman;
+   Anggota(string n, string id) : nama(n), idAnggota(id) {}
+    void tampilkanDetailAnggota() const {
+        cout << "------------------------------------" << endl;
+        cout << "Nama Anggota  : " << nama << endl;
+        cout << "ID Anggota    : " << idAnggota << endl;
+        cout << "Buku Dipinjam : " << bukuDipinjam.size() << endl;
+        if (!bukuDipinjam.empty()) {
+            cout << "  Daftar Buku Dipinjam:" << endl;
+            for (const auto* buku : bukuDipinjam) {
+                cout << "    - " << buku->judul << " (ISBN: " << buku->isbn << ")" << endl;
+            }
+        }
+        cout << "------------------------------------" << endl;
+    }
+    void pinjamBuku(Buku* buku) {
+        bukuDipinjam.push_back(buku);
+    }
+    bool kembalikanBuku(const string& isbn_buku) {
+        auto it = find_if(bukuDipinjam.begin(), bukuDipinjam.end(),
+                          [&](Buku* b) { return b->isbn == isbn_buku; });
+        if (it != bukuDipinjam.end()) {
+            bukuDipinjam.erase(it);
+            return true;
+        }
