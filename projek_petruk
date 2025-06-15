@@ -142,3 +142,79 @@ public:
             buku.tampilkanDetailBuku();
         }
     }
+        void tampilkanSemuaAnggota() const {
+        cout << "\n--- Daftar Semua Anggota ---" << endl;
+        if (daftarAnggota.empty()) {
+            cout << "Belum ada anggota yang terdaftar." << endl;
+            return;
+        }
+        for (const auto& anggota : daftarAnggota) {
+            anggota.tampilkanDetailAnggota();
+        }
+    }
+    Buku* cariBukuDenganIsbn(const string& isbn_cari) {
+        auto it = find_if(daftarBuku.begin(), daftarBuku.end(),
+                          [&](const Buku& b) { return b.isbn == isbn_cari; });
+        return (it != daftarBuku.end()) ? &(*it) : nullptr;
+    }
+    vector<Buku>::iterator cariBukuDenganIsbnRef(const string& isbn_ref) {
+        return find_if(daftarBuku.begin(), daftarBuku.end(),
+                       [&](const Buku& b) { return b.isbn == isbn_ref; });
+    }
+    Anggota* cariAnggotaDenganId(const string& idAnggota_cari) {
+        auto it = find_if(daftarAnggota.begin(), daftarAnggota.end(),
+                          [&](const Anggota& a) { return a.idAnggota == idAnggota_cari; });
+        return (it != daftarAnggota.end()) ? &(*it) : nullptr;
+    }
+    vector<Anggota>::iterator cariAnggotaDenganIdRef(const string& idAnggota_ref) {
+        return find_if(daftarAnggota.begin(), daftarAnggota.end(),
+                       [&](const Anggota& a) { return a.idAnggota == idAnggota_ref; });
+    }
+    void prosesPeminjamanBuku() {
+        cout << "\n--- Peminjaman Buku ---" << endl;
+        string idAnggota_pinjam, isbnBuku_pinjam;
+        cout << "Masukkan ID Anggota Peminjam: ";
+        cin >> idAnggota_pinjam;
+        cout << "Masukkan ISBN Buku yang akan Dipinjam: ";
+        cin >> isbnBuku_pinjam;
+        Anggota* anggota = cariAnggotaDenganId(idAnggota_pinjam);
+        Buku* buku = cariBukuDenganIsbn(isbnBuku_pinjam);
+        if (!anggota) {
+            cout << "Error: Anggota tidak ditemukan." << endl;
+            return;
+        }
+        if (!buku) {
+            cout << "Error: Buku tidak ditemukan." << endl;
+            return;
+        }
+        auto it_pinjam = find_if(anggota->bukuDipinjam.begin(), anggota->bukuDipinjam.end(),
+                                 [&](Buku* b_pinjam) { return b_pinjam->isbn == isbnBuku_pinjam; });
+        if (it_pinjam != anggota->bukuDipinjam.end()) {
+            cout << "Error: Buku sudah dipinjam oleh anggota." << endl;
+            return;
+        }
+        if (buku->pinjamBuku()) {
+            anggota->pinjamBuku(buku);
+            anggota->catatRiwayat(buku->isbn, buku->judul, "Dipinjam");
+            cout << "Buku berhasil dipinjam." << endl;
+        } else {
+            cout << "Buku tidak tersedia untuk dipinjam." << endl;
+        }
+    }
+    void prosesPengembalianBuku() {
+        cout << "\n--- Pengembalian Buku ---" << endl;
+        string idAnggota_kembali, isbnBuku_kembali;
+        cout << "Masukkan ID Anggota yang Mengembalikan: ";
+        cin >> idAnggota_kembali;
+        cout << "Masukkan ISBN Buku yang Dikembalikan: ";
+        cin >> isbnBuku_kembali;
+        Anggota* anggota = cariAnggotaDenganId(idAnggota_kembali);
+        Buku* buku = cariBukuDenganIsbn(isbnBuku_kembali);
+        if (!anggota) {
+            cout << "Error: Anggota tidak ditemukan." << endl;
+            return;
+        }
+        if (!buku) {
+            cout << "Error: Buku tidak terdaftar dalam sistem." << endl;
+            return;
+        }
