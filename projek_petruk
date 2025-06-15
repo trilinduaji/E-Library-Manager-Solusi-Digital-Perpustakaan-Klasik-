@@ -9,7 +9,7 @@ struct RiwayatPinjaman {
     string isbn;
     string judul;
     string tanggal;
-    string status; // "Dipinjam" atau "Dikembalikan"
+    string status; 
 };
 class Buku {
 public:
@@ -71,3 +71,74 @@ public:
             bukuDipinjam.erase(it);
             return true;
         }
+        return false;
+    }
+    void catatRiwayat(const string& isbn, const string& judul, const string& status) {
+        string tanggal = "Hari Ini"; // Sementara, bisa di-upgrade pakai date-time sesungguhnya
+        riwayatPinjaman.push_back({isbn, judul, tanggal, status});
+    }
+    void tampilkanRiwayatPinjaman() const {
+        cout << "\n--- Riwayat Pinjaman untuk " << nama << " (ID: " << idAnggota << ") ---" << endl;
+        if (riwayatPinjaman.empty()) {
+            cout << "  Tidak ada riwayat pinjaman." << endl;
+        } else {
+            for (const auto& r : riwayatPinjaman) {
+                cout << "  - " << r.judul << " (ISBN: " << r.isbn << "), "
+                     << r.status << " pada " << r.tanggal << endl;
+            }
+        }
+    }
+};
+class Perpustakaan {
+public:
+    vector<Buku> daftarBuku;
+    vector<Anggota> daftarAnggota;
+    void tambahBuku() {
+        string judul, penulis, isbn_buku;
+        int jumlahSalinan;
+        cout << "\n--- Tambah Buku Baru ---" << endl;
+        cout << "Masukkan Judul: ";
+        getline(cin >> ws, judul);
+        cout << "Masukkan Penulis: ";
+        getline(cin >> ws, penulis);
+        cout << "Masukkan ISBN: ";
+        cin >> isbn_buku;
+        if (cariBukuDenganIsbnRef(isbn_buku) != daftarBuku.end()) {
+            cout << "Error: Buku dengan ISBN " << isbn_buku << " sudah ada." << endl;
+            return;
+        }
+        cout << "Masukkan Jumlah Salinan: ";
+        cin >> jumlahSalinan;
+        if (cin.fail() || jumlahSalinan <= 0) {
+            cout << "Input jumlah salinan tidak valid." << endl;
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            return;
+        }
+        daftarBuku.emplace_back(judul, penulis, isbn_buku, jumlahSalinan);
+        cout << "Buku '" << judul << "' berhasil ditambahkan." << endl;
+    }
+    void tambahAnggota() {
+        string nama, idAnggota_baru;
+        cout << "\n--- Tambah Anggota Baru ---" << endl;
+        cout << "Masukkan Nama Anggota: ";
+        getline(cin >> ws, nama);
+        cout << "Masukkan ID Anggota: ";
+        cin >> idAnggota_baru;
+        if (cariAnggotaDenganIdRef(idAnggota_baru) != daftarAnggota.end()) {
+            cout << "Error: Anggota dengan ID " << idAnggota_baru << " sudah terdaftar." << endl;
+            return;
+        }
+        daftarAnggota.emplace_back(nama, idAnggota_baru);
+        cout << "Anggota '" << nama << "' berhasil ditambahkan." << endl;
+    }
+    void tampilkanSemuaBuku() const {
+        cout << "\n--- Daftar Semua Buku ---" << endl;
+        if (daftarBuku.empty()) {
+            cout << "Belum ada buku yang terdaftar." << endl;
+            return;
+        }
+        for (const auto& buku : daftarBuku) {
+            buku.tampilkanDetailBuku();
+        }
+    }
