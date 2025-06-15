@@ -218,3 +218,81 @@ public:
             cout << "Error: Buku tidak terdaftar dalam sistem." << endl;
             return;
         }
+        if (anggota->kembalikanBuku(isbnBuku_kembali)){
+            buku->kembalikanBuku();
+            anggota->catatRiwayat(buku->isbn, buku->judul, "Dikembalikan");
+            cout <<"Buku berhasil dikembalikan"<<endl;
+        }else{
+        cout << "Error: Buku ini tidak sedang dipinjam oleh anggota." << endl;
+        }
+    }
+
+    void jalankanMenu(){
+        int pilihan;
+        do {
+             cout << "===========================================" << endl;
+            cout << "====== SISTEM MENEJEMEN PERPUSTAKAAN ======" << endl;
+            cout << "=        1. Tambah Buku Baru              =" << endl;
+            cout << "=        2. Tambah Anggota Baru           =" << endl;
+            cout << "=        3. Tampilkan Semua Buku          =" << endl;
+            cout << "=        4. Tampilkan Semua Anggota       =" << endl;
+            cout << "=        5. Pinjam Buku                   =" << endl;
+            cout << "=        6. Kembalikan Buku               =" << endl;
+            cout << "=        7. Cari Buku (ISBN)              =" << endl;
+            cout << "=        8. Cari Anggota (ID)             =" << endl;
+            cout << "=        9. Riwayat Pinjaman Anggota      =" << endl;
+            cout << "=        0. Keluar                        =" << endl;
+            cout << "===========================================" << endl;
+            cout << "Masukkan pilihan Anda: ";
+            cin >> pilihan;
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+            switch (pilihan) {
+                case 1: tambahBuku(); break;
+                case 2: tambahAnggota(); break;
+                case 3: tampilkanSemuaBuku(); break;
+                case 4: tampilkanSemuaAnggota(); break;
+                case 5: prosesPeminjamanBuku(); break;
+                case 6: prosesPengembalianBuku(); break;
+                case 7: {
+                    string isbnCari;
+                    cout << "Masukkan ISBN: ";
+                    cin >> isbnCari;
+                    Buku* buku = cariBukuDenganIsbn(isbnCari);
+                    if (buku) buku->tampilkanDetailBuku();
+                    else cout << "Buku tidak ditemukan." << endl;
+                    break;
+                }
+                case 8: {
+                    string idCari;
+                    cout << "Masukkan ID Anggota: ";
+                    cin >> idCari;
+                    Anggota* anggota = cariAnggotaDenganId(idCari);
+                    if (anggota) anggota->tampilkanDetailAnggota();
+                    else cout << "Anggota tidak ditemukan." << endl;
+                    break;
+                }
+                case 9: {
+                    string idAnggota;
+                    cout << "Masukkan ID Anggota: ";
+                    cin >> idAnggota;
+                    Anggota* anggota = cariAnggotaDenganId(idAnggota);
+                    if (anggota) anggota->tampilkanRiwayatPinjaman();
+                    else cout << "Anggota tidak ditemukan." << endl;
+                    break;
+                }
+                case 0:
+                    cout << "Terima kasih telah menggunakan sistem." << endl;
+                    break;
+                default:
+                    cout << "Pilihan tidak valid." << endl;
+            }
+        } while (pilihan != 0);
+    }
+};
+
+int main() {
+    Perpustakaan perpus;
+    perpus.jalankanMenu();
+    return 0;
+}
